@@ -4,6 +4,34 @@ import java.io.IOException;
 
 public class BookShop {
 
+    public static void main(String[] args) throws Exception {
+        Reader scanner = new Reader();
+        int numBooks = scanner.nextInt();
+        int money = scanner.nextInt();
+
+        int[] prices = new int[numBooks + 1];
+        int[] pages = new int[numBooks + 1];
+
+        for (int i = 1; i < prices.length; i++) {
+            prices[i] = scanner.nextInt();
+        }
+
+        for (int i = 1; i < prices.length; i++) {
+            pages[i] = scanner.nextInt();
+        }
+
+        int[][] dp = new int[numBooks + 1][money + 1];
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[i].length; j++) {
+                if (prices[i] <= j) {
+                    dp[i][j] = dp[i - 1][j - prices[i]] + pages[i];
+                }
+                dp[i][j] = Math.max(dp[i][j], dp[i - 1][j]);
+            }
+        }
+        System.out.println(dp[dp.length - 1][dp[0].length - 1]);
+    }
+
     static class Reader {
         final private int BUFFER_SIZE = 1 << 16;
         private DataInputStream din;
@@ -125,33 +153,5 @@ public class BookShop {
                 return;
             din.close();
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        Reader scanner = new Reader();
-        int numBooks = scanner.nextInt();
-        int money = scanner.nextInt();
-
-        int[] prices = new int[numBooks + 1];
-        int[] pages = new int[numBooks + 1];
-
-        for (int i = 1; i < prices.length; i++) {
-            prices[i] = scanner.nextInt();
-        }
-
-        for (int i = 1; i < prices.length; i++) {
-            pages[i] = scanner.nextInt();
-        }
-
-        int[][] dp = new int[numBooks + 1][money + 1];
-        for (int i = 1; i < dp.length; i++) {
-            for (int j = 1; j < dp[i].length; j++) {
-                if (prices[i] <= j) {
-                    dp[i][j] = dp[i - 1][j - prices[i]] + pages[i];
-                }
-                dp[i][j] = Math.max(dp[i][j], dp[i - 1][j]);
-            }
-        }
-        System.out.println(dp[dp.length - 1][dp[0].length - 1]);
     }
 }
