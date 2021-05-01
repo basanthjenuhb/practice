@@ -21,6 +21,32 @@ public class CycleFinding {
         }
     }
 
+    private static int bellmanFord(int numNodes, List<Edge> edges, long[] distances, int[] parents, int source) {
+        int targetNode = 0;
+        distances[source] = 0;
+        for (int i = 0; i < numNodes; i++) {
+            targetNode = 0;
+            for (Edge edge : edges) {
+                if (edge.source == edge.destination && edge.cost < 0) {
+                    parents[edge.destination] = edge.source;
+                    targetNode = edge.destination;
+                }
+                if (distances[edge.source] == Long.MAX_VALUE) {
+                    continue;
+                }
+                if (distances[edge.destination] > distances[edge.source] + edge.cost) {
+                    distances[edge.destination] = distances[edge.source] + edge.cost;
+                    parents[edge.destination] = edge.source;
+                    targetNode = edge.destination;
+                }
+            }
+            if (targetNode == 0) {
+                break;
+            }
+        }
+        return targetNode;
+    }
+
     public static void main(String[] args) throws Exception {
         Reader scanner = new Reader();
         int numNodes = scanner.nextInt();
@@ -36,41 +62,43 @@ public class CycleFinding {
         }
 
         long[] distances = new long[numNodes + 1];
+        int[] parents = new int[numNodes + 1];
+        boolean[] visited = new boolean[numNodes + 1];
         Arrays.fill(distances, Long.MAX_VALUE);
         distances[1] = 0;
-        int[] parents = new int[numNodes + 1];
-        for (int i = 0; i < numNodes; i++) {
-            for (Edge edge : edges) {
-                if (distances[edge.source] == Long.MAX_VALUE) {
-                    continue;
-                }
-                if (distances[edge.destination] > distances[edge.source] + edge.cost) {
-                    distances[edge.destination] = distances[edge.source] + edge.cost;
-                    parents[edge.destination] = edge.source;
-                }
-            }
-        }
-
         int targetNode = 0;
-        for (Edge edge : edges) {
-            if (distances[edge.source] == Long.MAX_VALUE) {
-                continue;
+        for (int i = 1; i <= numNodes; i++) {
+            if (!visited[i]) {
+                targetNode = bellmanFord(numNodes, edges, distances, parents, i);
             }
-            if (distances[edge.destination] > distances[edge.source] + edge.cost) {
-                targetNode = edge.destination;
+            if (targetNode != 0) {
+                break;
+            }
+            for (int k = 1; k <= numNodes; k++) {
+                if (distances[k] != Long.MAX_VALUE) {
+                    visited[k] = true;
+                }
             }
         }
         if (targetNode == 0) {
             System.out.println("NO");
             return;
         }
+        for (int i = 0; i < numNodes; i++) {
+            targetNode = parents[targetNode];
+        }
+        System.out.println("YES");
+        List<Integer> cycle = new ArrayList<>();
         StringBuilder result = new StringBuilder();
-        result.append("YES\n").append(targetNode);
-        int tempNode = targetNode;
-        do {
-            tempNode = parents[tempNode];
-            result.append(" ").append(tempNode);
-        } while (tempNode != targetNode);
+        for (int node = targetNode;; node = parents[node]) {
+            cycle.add(node);
+            if (node == targetNode && cycle.size() > 1) {
+                break;
+            }
+        }
+        for (int i = cycle.size() - 1; i >= 0; i--) {
+            result.append(cycle.get(i)).append(" ");
+        }
         System.out.println(result);
     }
 
