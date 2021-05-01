@@ -6,7 +6,60 @@ import java.util.List;
 
 public class RoundTrip {
 
-    static class Reader {
+    public static void main(String[] args) throws Exception {
+        Reader scanner = new Reader();
+        int numNodes = scanner.nextInt();
+        int numEdges = scanner.nextInt();
+
+        List<Integer>[] graph = new List[numNodes + 1];
+        for (int i = 0; i < graph.length; i++) {
+            graph[i] = new ArrayList<>();
+        }
+
+        for (int i = 0; i < numEdges; i++) {
+            int source = scanner.nextInt();
+            int destination = scanner.nextInt();
+            graph[source].add(destination);
+            graph[destination].add(source);
+        }
+        int[] parents = new int[numNodes + 1];
+        boolean[] visited = new boolean[numNodes + 1];
+
+        for (int i = 1; i <= numNodes; i++) {
+            if (!visited[i]) {
+                dfs(graph, i, 0, parents, visited);
+            }
+        }
+        System.out.println("IMPOSSIBLE");
+    }
+
+    private static void dfs(List<Integer>[] graph, int node, int parent, int[] parents, boolean[] visited) {
+        visited[node] = true;
+        parents[node] = parent;
+        for (int child: graph[node]) {
+            if (child == parent) {
+                continue;
+            } else if (!visited[child]) {
+                dfs(graph, child, node, parents, visited);
+            } else {
+                StringBuilder result = new StringBuilder();
+                result.append(child).append(" ");
+                int count = 1;
+                while (node != child) {
+                    count++;
+                    result.append(node).append(" ");
+                    node = parents[node];
+                }
+                count++;
+                result.append(node).append(" ");
+                System.out.println(count);
+                System.out.println(result);
+                System.exit(0);
+            }
+        }
+    }
+
+    private static class Reader {
         final private int BUFFER_SIZE = 1 << 16;
         private DataInputStream din;
         private byte[] buffer;
@@ -126,59 +179,6 @@ public class RoundTrip {
             if (din == null)
                 return;
             din.close();
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        Reader scanner = new Reader();
-        int numNodes = scanner.nextInt();
-        int numEdges = scanner.nextInt();
-
-        List<Integer>[] graph = new List[numNodes + 1];
-        for (int i = 0; i < graph.length; i++) {
-            graph[i] = new ArrayList<>();
-        }
-
-        for (int i = 0; i < numEdges; i++) {
-            int source = scanner.nextInt();
-            int destination = scanner.nextInt();
-            graph[source].add(destination);
-            graph[destination].add(source);
-        }
-        int[] parents = new int[numNodes + 1];
-        boolean[] visited = new boolean[numNodes + 1];
-
-        for (int i = 1; i <= numNodes; i++) {
-            if (!visited[i]) {
-                dfs(graph, i, 0, parents, visited);
-            }
-        }
-        System.out.println("IMPOSSIBLE");
-    }
-
-    private static void dfs(List<Integer>[] graph, int node, int parent, int[] parents, boolean[] visited) {
-        visited[node] = true;
-        parents[node] = parent;
-        for (int child: graph[node]) {
-            if (child == parent) {
-                continue;
-            } else if (!visited[child]) {
-                dfs(graph, child, node, parents, visited);
-            } else {
-                StringBuilder result = new StringBuilder();
-                result.append(child).append(" ");
-                int count = 1;
-                while (node != child) {
-                    count++;
-                    result.append(node).append(" ");
-                    node = parents[node];
-                }
-                count++;
-                result.append(node).append(" ");
-                System.out.println(count);
-                System.out.println(result);
-                System.exit(0);
-            }
         }
     }
 }

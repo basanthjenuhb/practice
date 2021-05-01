@@ -7,7 +7,62 @@ import java.util.List;
 
 public class HighScore {
 
-    static class Reader {
+    private static class Edge {
+        int source;
+        int destination;
+        int cost;
+
+        public Edge(int source, int destination, int cost) {
+            this.source = source;
+            this.destination = destination;
+            this.cost = cost;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        Reader scanner = new Reader();
+        int numNodes = scanner.nextInt();
+        int numEdges = scanner.nextInt();
+
+        List<Edge> edges = new ArrayList<>();
+
+        for (int i = 0; i < numEdges; i++) {
+            int source = scanner.nextInt();
+            int destination = scanner.nextInt();
+            int cost = scanner.nextInt() * -1;
+            edges.add(new Edge(source, destination, cost));
+        }
+
+        long[] distances = new long[numNodes + 1];
+        Arrays.fill(distances, Long.MAX_VALUE);
+        distances[1] = 0;
+
+        for (int i = 1; i < numNodes; i++) {
+            for (Edge edge: edges) {
+                if (distances[edge.source] == Long.MAX_VALUE) {
+                    continue;
+                }
+                distances[edge.destination] = Math.min(distances[edge.destination], distances[edge.source] + edge.cost);
+            }
+        }
+        for (int i = 1; i < numNodes; i++) {
+            for (Edge edge : edges) {
+                if (distances[edge.source] == Long.MAX_VALUE) {
+                    continue;
+                }
+                if (distances[edge.source] == Long.MIN_VALUE || distances[edge.source] + edge.cost < distances[edge.destination]) {
+                    distances[edge.destination] = Long.MIN_VALUE;
+                }
+            }
+        }
+        if (distances[numNodes] == Long.MIN_VALUE) {
+            System.out.println("-1");
+            return;
+        }
+        System.out.println(distances[numNodes] * -1);
+    }
+
+    private static class Reader {
         final private int BUFFER_SIZE = 1 << 16;
         private DataInputStream din;
         private byte[] buffer;
@@ -130,58 +185,4 @@ public class HighScore {
         }
     }
 
-    static class Edge {
-        int source;
-        int destination;
-        int cost;
-
-        public Edge(int source, int destination, int cost) {
-            this.source = source;
-            this.destination = destination;
-            this.cost = cost;
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        Reader scanner = new Reader();
-        int numNodes = scanner.nextInt();
-        int numEdges = scanner.nextInt();
-
-        List<Edge> edges = new ArrayList<>();
-
-        for (int i = 0; i < numEdges; i++) {
-            int source = scanner.nextInt();
-            int destination = scanner.nextInt();
-            int cost = scanner.nextInt() * -1;
-            edges.add(new Edge(source, destination, cost));
-        }
-
-        long[] distances = new long[numNodes + 1];
-        Arrays.fill(distances, Long.MAX_VALUE);
-        distances[1] = 0;
-
-        for (int i = 1; i < numNodes; i++) {
-            for (Edge edge: edges) {
-                if (distances[edge.source] == Long.MAX_VALUE) {
-                    continue;
-                }
-                distances[edge.destination] = Math.min(distances[edge.destination], distances[edge.source] + edge.cost);
-            }
-        }
-        for (int i = 1; i < numNodes; i++) {
-            for (Edge edge : edges) {
-                if (distances[edge.source] == Long.MAX_VALUE) {
-                    continue;
-                }
-                if (distances[edge.source] == Long.MIN_VALUE || distances[edge.source] + edge.cost < distances[edge.destination]) {
-                    distances[edge.destination] = Long.MIN_VALUE;
-                }
-            }
-        }
-        if (distances[numNodes] == Long.MIN_VALUE) {
-            System.out.println("-1");
-            return;
-        }
-        System.out.println(distances[numNodes] * -1);
-    }
 }

@@ -1,57 +1,65 @@
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ShortestRoutesII {
+public class RoundTripII {
+
+    private static final int MOD = 1_000_000_007;
+
+    private static void dfs(int src, List<Integer>[] graph, boolean[] visited, int[] parents) {
+        visited[src] = true;
+        for (int child: graph[src]) {
+            if (!visited[child]) {
+                parents[child] = src;
+                dfs(child, graph, visited, parents);
+            } else {
+                StringBuilder result = new StringBuilder();
+                result.append(src);
+                int node = src;
+                int counter = 2;
+                do {
+                    src = parents[src];
+                    if (src == 0) {
+                        return;
+                    }
+                    counter++;
+                    result.insert(0, src + " ");
+                } while (src != child);
+                result.insert(0, node + " ");
+                System.out.println(counter);
+                System.out.println(result);
+                System.exit(0);
+            }
+            visited[child] = false;
+        }
+    }
 
     public static void main(String[] args) throws Exception {
         Reader scanner = new Reader();
         int numNodes = scanner.nextInt();
         int numEdges = scanner.nextInt();
-        int numQueries = scanner.nextInt();
 
-        long[][] graph = new long[numNodes + 1][numNodes + 1];
-        for (int i = 1; i < graph.length; i++) {
-            for (int j = 1; j < graph[i].length; j++) {
-                if (i == j) {
-                    graph[i][j] = 0;
-                } else {
-                    graph[i][j] = Long.MAX_VALUE;
-                }
-            }
+        List<Integer>[] graph = new List[numNodes + 1];
+        for (int i = 0; i < graph.length; i++) {
+            graph[i] = new ArrayList<>();
         }
 
         for (int i = 0; i < numEdges; i++) {
-            int source = scanner.nextInt();
-            int destination = scanner.nextInt();
-            int cost = scanner.nextInt();
-            graph[source][destination] = Math.min(cost, graph[source][destination]);
-            graph[destination][source] = Math.min(cost, graph[destination][source]);
+            int src = scanner.nextInt();
+            int dst = scanner.nextInt();
+            graph[src].add(dst);
         }
-
-        for (int k = 1; k < graph.length; k++) {
-            for (int i = 1; i < graph.length; i++) {
-                for (int j = 1; j < graph.length; j++) {
-                    if (graph[i][k] != Long.MAX_VALUE
-                        && graph[k][j] != Long.MAX_VALUE
-                        && graph[i][k] + graph[k][j] < graph[i][j]) {
-                        graph[i][j] = graph[i][k] + graph[k][j];
-                    }
-                }
+        boolean[] visited = new boolean[numNodes + 1];
+        int[] parents = new int[numNodes + 1];
+        for (int i = 1; i <= numNodes; i++) {
+            if (!visited[i]) {
+                dfs(i, graph, visited, parents);
             }
+            visited[i] = false;
         }
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < numQueries; i++) {
-            int source = scanner.nextInt();
-            int destination = scanner.nextInt();
-            long distance = graph[source][destination];
-            if (distance == Long.MAX_VALUE) {
-                result.append("-1\n");
-            } else {
-                result.append(distance).append("\n");
-            }
-        }
-        System.out.println(result);
+        System.out.println("IMPOSSIBLE");
     }
 
     private static class Reader {

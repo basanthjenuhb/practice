@@ -1,5 +1,8 @@
 import java.util.Scanner;
 
+/**
+ * Recurrence relation: comb(sum, coin[i]) = comb(sum, coin[i - 1]) + comb(sum - coin[i], coin[i])
+ */
 public class CoinCombinationsII {
     private static final int MOD = 1_000_000_007;
 

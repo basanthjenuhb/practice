@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Monsters {
 
-    static class Position {
+    private static class Position {
         Position parent;
         int x, y;
         char direction;

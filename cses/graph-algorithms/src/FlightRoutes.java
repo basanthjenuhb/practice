@@ -1,54 +1,56 @@
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
-public class ShortestRoutesII {
+public class FlightRoutes {
+
+    private static final int MOD = 1_000_000_007;
+
+    private static class Path {
+        int nodeId;
+        long cost;
+
+        public Path(int nodeId, long cost) {
+            this.nodeId = nodeId;
+            this.cost = cost;
+        }
+    }
 
     public static void main(String[] args) throws Exception {
         Reader scanner = new Reader();
         int numNodes = scanner.nextInt();
         int numEdges = scanner.nextInt();
-        int numQueries = scanner.nextInt();
-
-        long[][] graph = new long[numNodes + 1][numNodes + 1];
-        for (int i = 1; i < graph.length; i++) {
-            for (int j = 1; j < graph[i].length; j++) {
-                if (i == j) {
-                    graph[i][j] = 0;
-                } else {
-                    graph[i][j] = Long.MAX_VALUE;
-                }
-            }
+        int k = scanner.nextInt();
+        List<Path>[] graph = new List[numNodes + 1];
+        for (int i = 0; i < graph.length; i++) {
+            graph[i] = new ArrayList<>();
         }
-
         for (int i = 0; i < numEdges; i++) {
-            int source = scanner.nextInt();
-            int destination = scanner.nextInt();
+            int src = scanner.nextInt();
+            int dest = scanner.nextInt();
             int cost = scanner.nextInt();
-            graph[source][destination] = Math.min(cost, graph[source][destination]);
-            graph[destination][source] = Math.min(cost, graph[destination][source]);
+            graph[src].add(new Path(dest, cost));
         }
 
-        for (int k = 1; k < graph.length; k++) {
-            for (int i = 1; i < graph.length; i++) {
-                for (int j = 1; j < graph.length; j++) {
-                    if (graph[i][k] != Long.MAX_VALUE
-                        && graph[k][j] != Long.MAX_VALUE
-                        && graph[i][k] + graph[k][j] < graph[i][j]) {
-                        graph[i][j] = graph[i][k] + graph[k][j];
-                    }
-                }
-            }
-        }
+        Queue<Path> queue = new PriorityQueue<>(Comparator.comparingLong(p -> p.cost));
+        queue.add(new Path(1, 0));
+        int[] visited = new int[numNodes + 1];
         StringBuilder result = new StringBuilder();
-        for (int i = 0; i < numQueries; i++) {
-            int source = scanner.nextInt();
-            int destination = scanner.nextInt();
-            long distance = graph[source][destination];
-            if (distance == Long.MAX_VALUE) {
-                result.append("-1\n");
-            } else {
-                result.append(distance).append("\n");
+        while (!queue.isEmpty() && visited[numNodes] < k) {
+            Path path = queue.poll();
+            visited[path.nodeId]++;
+            if (path.nodeId == numNodes) {
+                result.append(path.cost).append(" ");
+            }
+            if (visited[path.nodeId] <= k) {
+                for (Path edge: graph[path.nodeId]) {
+                    queue.add(new Path(edge.nodeId,path.cost + edge.cost));
+                }
             }
         }
         System.out.println(result);

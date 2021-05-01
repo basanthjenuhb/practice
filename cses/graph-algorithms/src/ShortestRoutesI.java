@@ -58,7 +58,7 @@ public class ShortestRoutesI {
         System.out.println(result);
     }
 
-    static class Reader {
+    private static class Reader {
         final private int BUFFER_SIZE = 1 << 16;
         private DataInputStream din;
         private byte[] buffer;
