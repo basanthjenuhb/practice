@@ -3,6 +3,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * Calculate number of ways of generating (sum(n)/2)
+ * Then it is a variant of subset sum problem
+ * While doing subset sum, you should ignore last element
+ * reason is, include all subsets ignoring the last number, so that you can get half the subsets
+ */
 public class TwoSetsII {
 
     private static final int MOD = 1_000_000_007;
@@ -10,7 +16,22 @@ public class TwoSetsII {
     public static void main(String[] args) throws Exception {
         Reader scanner = new Reader();
         int num = scanner.nextInt();
-
+        int sum = num * (num + 1)/2;
+        if (sum % 2 == 1) {
+            System.out.println(0);
+            return;
+        }
+        sum = sum / 2;
+        int[] dp = new int[sum + 1];
+        dp[0] = 1;
+        for (int i = 1; i < num; i++) {
+            for (int j = dp.length - 1; j >= 0; j--) {
+                if (j - i >= 0) {
+                    dp[j] = (dp[j] + dp[j - i]) % MOD;
+                }
+            }
+        }
+        System.out.println(dp[dp.length - 1]);
     }
 
 
